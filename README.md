@@ -26,7 +26,7 @@ You can install from source:
 
 ```bash
 git clone https://github.com/fal-ai-community/alphabet-dataset
-cd syntht2i
+cd alphabet-dataset
 pip install -e .
 ```
 
