@@ -79,6 +79,34 @@ Each sample consists of:
     - Position (x1, y1, x2, y2)
     - Color (RGB)
 
+# For 2025 Contest
+
+You can use cached parameters as it takes some time to generate them and might hurt the experiment cycle.
+
+```python
+from syntht2i import ShapeDataset
+
+valset = ShapeDataset(
+    length=100,
+    image_size=64,
+    max_shapes=3,
+    seed=0,
+    nocolor=True,
+    granularity=8,
+    download_url="https://github.com/fal-ai-community/alphabet-dataset/raw/refs/heads/main/contest_param/2025contest_validationsetparams.pt"
+)
+
+trainset = ShapeDataset(
+    length=100000,
+    image_size=64,
+    max_shapes=3,
+    seed=42,
+    nocolor=True,
+    granularity=8,
+    download_url="https://github.com/fal-ai-community/alphabet-dataset/raw/refs/heads/main/contest_param/2025contest_trainsetparams.pt"
+)
+```
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.

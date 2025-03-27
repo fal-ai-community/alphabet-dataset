@@ -186,9 +186,12 @@ class ShapeDataset(Dataset):
         # Create image with background color
         img = Image.new("RGB", (self.image_size, self.image_size), color=bg_color)
         draw = ImageDraw.Draw(img)
-
-        # Determine how many shapes are in this image
-        num_shapes = self.num_shapes_per_image[idx].item()
+        
+        num_shapes = 0
+        for j in range(self.max_shapes):
+            start_idx = 3 + (j * 8)
+            if params[start_idx] >= 0:  # Valid shape has non-negative index
+                num_shapes += 1
 
         # Draw each shape
         for j in range(num_shapes):
