@@ -26,7 +26,7 @@ def get_font(bold=True, size=32):
 
 class ShapeDataset(Dataset):
 
-    def __init__(self, length=1000, image_size=256, max_shapes=3, seed=42, offset=512, nocolor=False, granularity=8):
+    def __init__(self, length=1000, image_size=256, max_shapes=3, seed=42, offset=512, nocolor=False, granularity=8, download_url=None):
         """
         Initialize the dataset.
 
@@ -53,12 +53,31 @@ class ShapeDataset(Dataset):
         self.font_size = image_size // 3 # A reasonable size for the shape
         self.font = get_font(size = self.font_size)
 
-        # Generate all parameters for the entire dataset at initialization
-        self._generate_parameters()
+        if download_url is not None:
+            self.download_url = download_url
+            self._download_parameters()
+        else:
+            # Generate all parameters for the entire dataset at initialization
+            self._generate_parameters()
 
         # Transform to convert PIL images to tensors
         self.to_tensor = transforms.ToTensor()
-
+        
+    def _download_parameters(self):
+        # save here
+        import requests
+        import os
+        # Create a directory for the downloaded files
+        os.makedirs("./shapedataset_cache", exist_ok=True)
+        filename = os.path.basename(self.download_url)
+        filepath = os.path.join("./shapedataset_cache", filename)
+        if not os.path.exists(filepath):
+            response = requests.get(self.download_url)
+            with open(filepath, "wb") as f:
+                f.write(response.content)
+                
+        self.parameters = torch.load(filepath, weights_only=False)
+        
     def _generate_parameters(self):
         """Generate all parameters for the dataset."""
         # Generate the number of shapes for each image (1 to max_shapes)
