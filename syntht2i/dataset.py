@@ -206,6 +206,7 @@ class ShapeDataset(Dataset):
         return x, y + 1
 
     def decode_params(self, params):
+        params = params - 1
         """
         Decode parameters into a more readable format.
 
