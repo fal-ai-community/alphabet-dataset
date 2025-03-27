@@ -25,20 +25,8 @@ def get_font(bold=True, size=32):
 
 
 class ShapeDataset(Dataset):
-    """
-    A synthetic dataset that generates images with multiple shapes of different colors.
 
-    Each sample consists of:
-    - x: RGB image (256x256) with shapes on a colored background
-    - y: Flattened tensor containing information about:
-        - Background color (RGB)
-        - For each shape:
-            - Shape type (integer from OFFSET to OFFSET + num_shapes)
-            - Shape position and size (x1, y1, x2, y2)
-            - Shape color (RGB)
-    """
-
-    def __init__(self, length=1000, image_size=256, max_shapes=3, seed=42, offset=512):
+    def __init__(self, length=1000, image_size=256, max_shapes=3, seed=42, offset=512, nocolor=False, granularity=8):
         """
         Initialize the dataset.
 
@@ -48,19 +36,21 @@ class ShapeDataset(Dataset):
             max_shapes (int): Maximum number of shapes per image.
             seed (int): Random seed for reproducibility.
             offset (int): Offset value for shape type encoding.
+            granularity (int): Granularity of the parameters. Make everything multiple of this, so its less difficult if granularity is larger.
         """
         self.length = length
         self.image_size = image_size
         self.max_shapes = max_shapes
         self.generator = torch.Generator().manual_seed(seed)
         self.offset = offset
-
+        self.nocolor = nocolor
+        self.granularity = granularity
         # Available shapes (using alphabet letters as shapes)
         self.alphabet = list(string.ascii_uppercase)  # A-Z
         self.num_shapes = len(self.alphabet)
 
         # Try to load font
-        self.font_size = image_size // 4 # A reasonable size for the shape
+        self.font_size = image_size // 3 # A reasonable size for the shape
         self.font = get_font(size = self.font_size)
 
         # Generate all parameters for the entire dataset at initialization
@@ -79,6 +69,9 @@ class ShapeDataset(Dataset):
         self.bg_colors = torch.randint(
             0, 256, (self.length, 3), generator=self.generator
         )
+        
+        if self.nocolor:
+            self.bg_colors = torch.ones_like(self.bg_colors) * 255
 
         # Max size for the parameters:
         # For each possible shape, we need:
@@ -141,6 +134,9 @@ class ShapeDataset(Dataset):
                 # Put color into parameters
                 color_idx = pos_idx + 4
                 self.parameters[i, color_idx : color_idx + 3] = color
+                
+            _param = (self.parameters / self.granularity).long() * self.granularity
+            self.parameters = torch.where(self.parameters == -1, self.parameters, _param)
                 
     def __len__(self):
         """Return the number of samples in the dataset."""

@@ -2,6 +2,15 @@
 
 A Python package for generating synthetic datasets of images containing multiple letter shapes with various colors and positions. Perfect for testing text-conditional diffusion models.
 
+## Example Output
+
+<p align="center">
+  <img src="content/output.png" alt="Example of generated images">
+</p>
+
+This package generates synthetic images with letter shapes that can be used for training and testing text-to-image models. Each image contains a configurable number of letter shapes with various colors and positions.
+
+
 ## Features
 
 - Generate images with multiple letter shapes (A-Z)
@@ -38,6 +47,7 @@ dataset = ShapeDataset(
     image_size=256,     # Image size (square)
     max_shapes=3,       # Maximum shapes per image
     seed=42            # Random seed for reproducibility
+    nocolor=True      # White Background
 )
 
 # Get a single sample
@@ -57,14 +67,6 @@ from torch.utils.data import DataLoader
 dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
 ```
 
-## Interactive Viewer
-
-The package includes a Streamlit-based interactive viewer. To use it:
-
-```bash
-streamlit run -m syntht2i.visualize
-```
-
 ## Dataset Format
 
 Each sample consists of:
@@ -73,13 +75,9 @@ Each sample consists of:
 - **y**: Parameter tensor containing:
   - Background color (RGB)
   - For each shape:
-    - Shape type (one-hot encoding of letter A-Z)
+    - Shape type (shape encoding of letter A-Z)
     - Position (x1, y1, x2, y2)
     - Color (RGB)
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
